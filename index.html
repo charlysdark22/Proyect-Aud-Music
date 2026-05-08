@@ -19,11 +19,7 @@
             --border: rgba(201, 168, 108, 0.2);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -33,9 +29,7 @@
             overflow-x: hidden;
         }
 
-        .font-display {
-            font-family: 'Playfair Display', serif;
-        }
+        .font-display { font-family: 'Playfair Display', serif; }
 
         /* Overlay de entrada */
         .enter-overlay {
@@ -58,7 +52,6 @@
         }
 
         .enter-btn {
-            position: relative;
             padding: 1.2rem 3rem;
             background: transparent;
             border: 1px solid var(--accent);
@@ -71,23 +64,9 @@
             transition: all 0.4s ease;
         }
 
-        .enter-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--accent);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s ease;
-            z-index: -1;
-        }
-
         .enter-btn:hover {
+            background: var(--accent);
             color: var(--bg);
-        }
-
-        .enter-btn:hover::before {
-            transform: scaleX(1);
         }
 
         /* Fondo animado */
@@ -115,41 +94,16 @@
             animation: float 20s ease-in-out infinite;
         }
 
-        .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: rgba(201, 168, 108, 0.08);
-            top: -100px;
-            left: -100px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 300px;
-            height: 300px;
-            background: rgba(139, 90, 43, 0.06);
-            bottom: -50px;
-            right: -50px;
-            animation-delay: -7s;
-        }
-
-        .orb-3 {
-            width: 200px;
-            height: 200px;
-            background: rgba(201, 168, 108, 0.05);
-            top: 50%;
-            left: 50%;
-            animation-delay: -14s;
-        }
+        .orb-1 { width: 400px; height: 400px; background: rgba(201, 168, 108, 0.08); top: -100px; left: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: rgba(139, 90, 43, 0.06); bottom: -50px; right: -50px; animation-delay: -7s; }
+        .orb-3 { width: 200px; height: 200px; background: rgba(201, 168, 108, 0.05); top: 50%; left: 50%; animation-delay: -14s; }
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -30px) scale(1.05); }
             50% { transform: translate(-20px, 20px) scale(0.95); }
-            75% { transform: translate(20px, 10px) scale(1.02); }
         }
 
-        /* Visualizador de audio */
+        /* Visualizador */
         .visualizer {
             position: fixed;
             bottom: 2rem;
@@ -164,9 +118,7 @@
             transition: opacity 0.5s ease;
         }
 
-        .visualizer.active {
-            opacity: 1;
-        }
+        .visualizer.active { opacity: 1; }
 
         .bar {
             width: 3px;
@@ -175,7 +127,7 @@
             transition: height 0.1s ease;
         }
 
-        /* Contenido principal */
+        /* Contenido */
         .main-content {
             position: relative;
             z-index: 5;
@@ -211,12 +163,7 @@
             animation-delay: 0.6s;
         }
 
-        @keyframes reveal {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
 
         /* Indicador de audio */
         .audio-indicator {
@@ -237,13 +184,8 @@
             z-index: 10;
         }
 
-        .audio-indicator.visible {
-            opacity: 1;
-        }
-
-        .audio-indicator.playing {
-            color: var(--accent);
-        }
+        .audio-indicator.visible { opacity: 1; }
+        .audio-indicator.playing { color: var(--accent); }
 
         .pulse-dot {
             width: 8px;
@@ -264,34 +206,20 @@
         }
 
         /* Líneas decorativas */
-        .lines {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .line {
-            position: absolute;
-            width: 1px;
-            height: 100%;
-            background: linear-gradient(to bottom, transparent, var(--border), transparent);
-            opacity: 0.3;
-        }
-
+        .lines { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+        .line { position: absolute; width: 1px; height: 100%; background: linear-gradient(to bottom, transparent, var(--border), transparent); opacity: 0.3; }
         .line:nth-child(1) { left: 20%; }
         .line:nth-child(2) { left: 50%; }
         .line:nth-child(3) { left: 80%; }
 
-        /* Controles de volumen */
-        .volume-control {
+        /* Controles de audio (Barra inferior) */
+        .audio-controls-wrapper {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem; /* Espacio entre botones */
             padding: 0.75rem 1.25rem;
             background: var(--card);
             border: 1px solid var(--border);
@@ -301,9 +229,22 @@
             z-index: 10;
         }
 
-        .volume-control.visible {
-            opacity: 1;
+        .audio-controls-wrapper.visible { opacity: 1; }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            transition: color 0.3s ease, transform 0.2s ease;
         }
+
+        .ctrl-btn:hover { color: var(--accent); transform: scale(1.1); }
+        .ctrl-btn.active { color: var(--accent); }
 
         .volume-slider {
             width: 80px;
@@ -313,6 +254,7 @@
             background: var(--border);
             border-radius: 2px;
             cursor: pointer;
+            margin-left: 0.5rem; /* Separación del botón de mute */
         }
 
         .volume-slider::-webkit-slider-thumb {
@@ -325,24 +267,12 @@
             transition: transform 0.2s ease;
         }
 
-        .volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .volume-icon {
-            color: var(--accent);
-        }
+        .volume-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
         /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
-            .orb, .pulse-dot, .bar {
-                animation: none;
-            }
-            .title, .subtitle {
-                animation: none;
-                opacity: 1;
-                transform: none;
-            }
+            .orb, .pulse-dot, .bar { animation: none; }
+            .title, .subtitle { animation: none; opacity: 1; transform: none; }
         }
     </style>
 </head>
@@ -351,9 +281,7 @@
     <div class="enter-overlay" id="enterOverlay">
         <h1 class="font-display text-4xl md:text-5xl tracking-wide" style="color: var(--accent);">Ambient Space</h1>
         <p class="text-sm tracking-widest uppercase" style="color: var(--muted);">Experiencia sonora inmersiva</p>
-        <button class="enter-btn" id="enterBtn" aria-label="Entrar y activar audio">
-            ENTRAR
-        </button>
+        <button class="enter-btn" id="enterBtn" aria-label="Entrar y activar audio">ENTRAR</button>
         <p class="text-xs" style="color: var(--muted); margin-top: 1rem;">Haz clic para activar el audio ambiental</p>
     </div>
 
@@ -370,10 +298,10 @@
         <div class="line"></div>
     </div>
 
-    <!-- Indicador de audio -->
+    <!-- Indicador de estado superior -->
     <div class="audio-indicator" id="audioIndicator">
         <span class="pulse-dot"></span>
-        <span class="status-text">Audio activo</span>
+        <span class="status-text" id="statusText">Audio activo</span>
     </div>
 
     <!-- Contenido principal -->
@@ -391,226 +319,196 @@
     <!-- Visualizador -->
     <div class="visualizer" id="visualizer"></div>
 
-    <!-- Control de volumen -->
-    <div class="volume-control" id="volumeControl">
-        <svg class="volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-        </svg>
+    <!-- Controles de Audio (Play, Mute, Volumen) -->
+    <div class="audio-controls-wrapper" id="audioControls">
+        <!-- Botón Play/Pause -->
+        <button class="ctrl-btn active" id="playPauseBtn" aria-label="Pausar audio">
+            <!-- Icono Pausa (estado inicial: reproduciendo) -->
+            <svg id="iconPause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            <!-- Icono Play (oculto inicialmente) -->
+            <svg id="iconPlay" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                <polygon points="5,3 19,12 5,21"></polygon>
+            </svg>
+        </button>
+
+        <!-- Botón Mute/Unmute -->
+        <button class="ctrl-btn" id="muteBtn" aria-label="Silenciar audio">
+            <!-- Icono Volumen On -->
+            <svg id="iconVolOn" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <!-- Icono Volumen Off (oculto inicialmente) -->
+            <svg id="iconVolOff" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+        </button>
+
+        <!-- Slider de Volumen -->
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" aria-label="Control de volumen">
     </div>
 
     <script>
         // =====================
-        // Variables globales inicializadas primero
+        // 1. CONFIGURACION INICIAL
         // =====================
-        let audioContext = null;
-        let masterGain = null;
-        let isPlaying = false;
+        
+        // Elementos del DOM
+        const enterOverlay = document.getElementById('enterOverlay');
+        const enterBtn = document.getElementById('enterBtn');
+        const audioIndicator = document.getElementById('audioIndicator');
+        const statusText = document.getElementById('statusText');
+        const audioControls = document.getElementById('audioControls');
+        const visualizerEl = document.getElementById('visualizer');
+        
+        // Controles
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        
+        // Iconos
+        const iconPlay = document.getElementById('iconPlay');
+        const iconPause = document.getElementById('iconPause');
+        const iconVolOn = document.getElementById('iconVolOn');
+        const iconVolOff = document.getElementById('iconVolOff');
+
+        // Variables de audio
+        // Asegúrate de que 'audio.mp3' exista en la misma carpeta
+        const audio = new Audio('./audio.mp3');
+        audio.loop = true;
+        audio.volume = 0.5;
+
         let animationId = null;
         const bars = [];
         const numBars = 32;
 
-        // =====================
-        // Crear visualizador
-        // =====================
-        const visualizer = document.getElementById('visualizer');
+        // Crear barras del visualizador
         for (let i = 0; i < numBars; i++) {
             const bar = document.createElement('div');
             bar.className = 'bar';
             bar.style.height = '4px';
-            visualizer.appendChild(bar);
+            visualizerEl.appendChild(bar);
             bars.push(bar);
         }
 
         // =====================
-        // Elementos del DOM
+        // 2. FUNCIONES DE CONTROL
         // =====================
-        const enterOverlay = document.getElementById('enterOverlay');
-        const enterBtn = document.getElementById('enterBtn');
-        const audioIndicator = document.getElementById('audioIndicator');
-        const volumeControl = document.getElementById('volumeControl');
-        const volumeSlider = document.getElementById('volumeSlider');
 
-        // =====================
-        // Generador de música ambiental con Web Audio API
-        // =====================
-function createAmbientMusic() {
-    const audio = new Audio('./audio.mp3');
-    audio.loop = true;
-    audio.volume = 0.5;
-    audio.play();
-    isPlaying = true;
-}
-            // Crear contexto de audio
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            masterGain = audioContext.createGain();
-            masterGain.gain.value = 0.5;
-            masterGain.connect(audioContext.destination);
-
-            // Crear múltiples osciladores para textura rica
-            const frequencies = [110, 146.83, 164.81, 196, 220, 261.63, 329.63];
-            
-            frequencies.forEach((freq, index) => {
-                createOscillatorLayer(freq, index);
-            });
-
-            // Añadir ruido rosa suave para textura
-            createNoiseLayer();
-
-            isPlaying = true;
-        
-
-        function createOscillatorLayer(frequency, index) {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            const filter = audioContext.createBiquadFilter();
-            
-            // Configuración
-            osc.type = ['sine', 'triangle'][index % 2];
-            osc.frequency.value = frequency;
-            
-            // Filtro paso bajo suave
-            filter.type = 'lowpass';
-            filter.frequency.value = 800;
-            filter.Q.value = 1;
-            
-            // Volumen bajo para cada capa
-            gain.gain.value = 0.03 + (Math.random() * 0.02);
-            
-            // Modulación LFO para movimiento
-            const lfo = audioContext.createOscillator();
-            const lfoGain = audioContext.createGain();
-            lfo.frequency.value = 0.1 + (Math.random() * 0.3);
-            lfoGain.gain.value = frequency * 0.02;
-            
-            lfo.connect(lfoGain);
-            lfoGain.connect(osc.frequency);
-            
-            // Conexiones
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(masterGain);
-            
-            // Iniciar
-            osc.start();
-            lfo.start();
-        }
-
-        function createNoiseLayer() {
-            const bufferSize = 2 * audioContext.sampleRate;
-            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const output = noiseBuffer.getChannelData(0);
-            
-            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                b0 = 0.99886 * b0 + white * 0.0555179;
-                b1 = 0.99332 * b1 + white * 0.0750759;
-                b2 = 0.96900 * b2 + white * 0.1538520;
-                b3 = 0.86650 * b3 + white * 0.3104856;
-                b4 = 0.55000 * b4 + white * 0.5329522;
-                b5 = -0.7616 * b5 - white * 0.0168980;
-                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-                b6 = white * 0.115926;
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
             }
-            
-            const noise = audioContext.createBufferSource();
-            noise.buffer = noiseBuffer;
-            noise.loop = true;
-            
-            const noiseFilter = audioContext.createBiquadFilter();
-            noiseFilter.type = 'lowpass';
-            noiseFilter.frequency.value = 400;
-            
-            const noiseGain = audioContext.createGain();
-            noiseGain.gain.value = 0.015;
-            
-            noise.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(masterGain);
-            noise.start();
         }
 
-        // =====================
-        // Animación del visualizador
-        // =====================
+        function toggleMute() {
+            audio.muted = !audio.muted;
+            updateMuteIcon();
+        }
+
+        function updatePlayPauseIcon() {
+            if (audio.paused) {
+                iconPause.style.display = 'none';
+                iconPlay.style.display = 'block';
+                playPauseBtn.classList.remove('active');
+                statusText.textContent = "Pausado";
+                audioIndicator.classList.remove('playing');
+            } else {
+                iconPause.style.display = 'block';
+                iconPlay.style.display = 'none';
+                playPauseBtn.classList.add('active');
+                statusText.textContent = "Audio activo";
+                audioIndicator.classList.add('playing');
+            }
+        }
+
+        function updateMuteIcon() {
+            if (audio.muted) {
+                iconVolOn.style.display = 'none';
+                iconVolOff.style.display = 'block';
+                muteBtn.classList.add('active');
+            } else {
+                iconVolOn.style.display = 'block';
+                iconVolOff.style.display = 'none';
+                muteBtn.classList.remove('active');
+            }
+        }
+
+        // Visualizador animado simple
         function animateVisualizer() {
-            bars.forEach((bar, i) => {
-                const height = Math.max(4, Math.random() * 50 + 10);
-                bar.style.height = height + 'px';
+            bars.forEach((bar) => {
+                if (!audio.paused) {
+                    const height = Math.max(4, Math.random() * 50 + 10);
+                    bar.style.height = height + 'px';
+                } else {
+                    bar.style.height = '4px';
+                }
             });
-            
             animationId = requestAnimationFrame(animateVisualizer);
         }
 
         // =====================
-        // Control de volumen
+        // 3. EVENT LISTENERS
         // =====================
-        volumeSlider.addEventListener('input', (e) => {
-            if (masterGain) {
-                masterGain.gain.value = e.target.value / 100;
-            }
-        });
 
-        // =====================
-        // Evento de entrada
-        // =====================
+        // Inicio
         enterBtn.addEventListener('click', () => {
-            // Ocultar overlay
             enterOverlay.classList.add('hidden');
             
-            // Iniciar música
-            createAmbientMusic();
+            // Intentar reproducir
+            audio.play().catch(e => console.log("Error al reproducir:", e));
             
-            // Mostrar controles
+            // Mostrar UI
             setTimeout(() => {
                 audioIndicator.classList.add('visible', 'playing');
-                volumeControl.classList.add('visible');
-                visualizer.classList.add('active');
+                audioControls.classList.add('visible');
+                visualizerEl.classList.add('active');
             }, 300);
             
-            // Iniciar visualizador
+            // Iniciar animación
             animateVisualizer();
         });
 
-        // =====================
-        // Soporte para teclado
-        // =====================
+        // Botones de control
+        playPauseBtn.addEventListener('click', togglePlay);
+        muteBtn.addEventListener('click', toggleMute);
+
+        // Volumen
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value / 100;
+            // Si movemos el slider, quitamos el mute automáticamente
+            if (audio.muted) {
+                audio.muted = false;
+                updateMuteIcon();
+            }
+        });
+
+        // Actualizar UI cuando el audio cambia de estado
+        audio.addEventListener('play', updatePlayPauseIcon);
+        audio.addEventListener('pause', updatePlayPauseIcon);
+
+        // Pausar al cambiar de pestaña
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                audio.pause();
+            } else {
+                // Opcional: auto-resumir al volver
+                // audio.play(); 
+            }
+        });
+
+        // Teclado accesibilidad
         enterBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 enterBtn.click();
-            }
-        });
-
-        // =====================
-        // Cleanup al salir
-        // =====================
-        window.addEventListener('beforeunload', () => {
-            if (audioContext) {
-                audioContext.close();
-            }
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
-        });
-
-        // =====================
-        // Pausar/reanudar al cambiar de pestaña
-        // =====================
-        document.addEventListener('visibilitychange', () => {
-            if (audioContext) {
-                if (document.hidden) {
-                    audioContext.suspend();
-                    audioIndicator.classList.remove('playing');
-                    audioIndicator.querySelector('.status-text').textContent = 'Audio pausado';
-                } else {
-                    audioContext.resume();
-                    audioIndicator.classList.add('playing');
-                    audioIndicator.querySelector('.status-text').textContent = 'Audio activo';
-                }
             }
         });
     </script>
