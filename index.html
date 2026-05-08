@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient Soundscape</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --fg: #e8e6e3;
+            --muted: #6b6b7b;
+            --accent: #c9a86c;
+            --accent-dim: rgba(201, 168, 108, 0.15);
+            --card: rgba(20, 20, 30, 0.6);
+            --border: rgba(201, 168, 108, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Overlay de entrada */
+        .enter-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .enter-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .enter-btn {
+            position: relative;
+            padding: 1.2rem 3rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+            z-index: -1;
+        }
+
+        .enter-btn:hover {
+            color: var(--bg);
+        }
+
+        .enter-btn:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Fondo animado */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 168, 108, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(139, 90, 43, 0.06) 0%, transparent 50%),
+                var(--bg);
+        }
+
+        .floating-orbs {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(201, 168, 108, 0.08);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: rgba(139, 90, 43, 0.06);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: rgba(201, 168, 108, 0.05);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 10px) scale(1.02); }
+        }
+
+        /* Visualizador de audio */
+        .visualizer {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 60px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .visualizer.active {
+            opacity: 1;
+        }
+
+        .bar {
+            width: 3px;
+            background: linear-gradient(to top, var(--accent), rgba(201, 168, 108, 0.3));
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            position: relative;
+            z-index: 5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: reveal 1s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-weight: 300;
+            color: var(--muted);
+            max-width: 500px;
+            line-height: 1.7;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: reveal 1s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Indicador de audio */
+        .audio-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--muted);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .audio-indicator.visible {
+            opacity: 1;
+        }
+
+        .audio-indicator.playing {
+            color: var(--accent);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--muted);
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .audio-indicator.playing .pulse-dot {
+            background: var(--accent);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        /* Líneas decorativas */
+        .lines {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--border), transparent);
+            opacity: 0.3;
+        }
+
+        .line:nth-child(1) { left: 20%; }
+        .line:nth-child(2) { left: 50%; }
+        .line:nth-child(3) { left: 80%; }
+
+        /* Controles de volumen */
+        .volume-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .volume-control.visible {
+            opacity: 1;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .volume-icon {
+            color: var(--accent);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .orb, .pulse-dot, .bar {
+                animation: none;
+            }
+            .title, .subtitle {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay de entrada -->
+    <div class="enter-overlay" id="enterOverlay">
+        <h1 class="font-display text-4xl md:text-5xl tracking-wide" style="color: var(--accent);">Ambient Space</h1>
+        <p class="text-sm tracking-widest uppercase" style="color: var(--muted);">Experiencia sonora inmersiva</p>
+        <button class="enter-btn" id="enterBtn" aria-label="Entrar y activar audio">
+            ENTRAR
+        </button>
+        <p class="text-xs" style="color: var(--muted); margin-top: 1rem;">Haz clic para activar el audio ambiental</p>
+    </div>
+
+    <!-- Fondo -->
+    <div class="bg-pattern"></div>
+    <div class="floating-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="lines">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+
+    <!-- Indicador de audio -->
+    <div class="audio-indicator" id="audioIndicator">
+        <span class="pulse-dot"></span>
+        <span class="status-text">Audio activo</span>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <h1 class="font-display title" style="color: var(--fg);">
+            Sumérgete en el<br>
+            <span style="color: var(--accent);">Sonido Ambiental</span>
+        </h1>
+        <p class="subtitle">
+            Una experiencia sonora continua que te acompaña mientras exploras. 
+            La música fluye sin interrupciones hasta que decidas partir.
+        </p>
+    </main>
+
+    <!-- Visualizador -->
+    <div class="visualizer" id="visualizer"></div>
+
+    <!-- Control de volumen -->
+    <div class="volume-control" id="volumeControl">
+        <svg class="volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" aria-label="Control de volumen">
+    </div>
+
+    <script>
+        // =====================
+        // Variables globales inicializadas primero
+        // =====================
+        let audioContext = null;
+        let masterGain = null;
+        let isPlaying = false;
+        let animationId = null;
+        const bars = [];
+        const numBars = 32;
+
+        // =====================
+        // Crear visualizador
+        // =====================
+        const visualizer = document.getElementById('visualizer');
+        for (let i = 0; i < numBars; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.height = '4px';
+            visualizer.appendChild(bar);
+            bars.push(bar);
+        }
+
+        // =====================
+        // Elementos del DOM
+        // =====================
+        const enterOverlay = document.getElementById('enterOverlay');
+        const enterBtn = document.getElementById('enterBtn');
+        const audioIndicator = document.getElementById('audioIndicator');
+        const volumeControl = document.getElementById('volumeControl');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // =====================
+        // Generador de música ambiental con Web Audio API
+        // =====================
+function createAmbientMusic() {
+    const audio = new Audio('./audio.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play();
+    isPlaying = true;
+}
+            // Crear contexto de audio
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioContext.createGain();
+            masterGain.gain.value = 0.5;
+            masterGain.connect(audioContext.destination);
+
+            // Crear múltiples osciladores para textura rica
+            const frequencies = [110, 146.83, 164.81, 196, 220, 261.63, 329.63];
+            
+            frequencies.forEach((freq, index) => {
+                createOscillatorLayer(freq, index);
+            });
+
+            // Añadir ruido rosa suave para textura
+            createNoiseLayer();
+
+            isPlaying = true;
+        
+
+        function createOscillatorLayer(frequency, index) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            // Configuración
+            osc.type = ['sine', 'triangle'][index % 2];
+            osc.frequency.value = frequency;
+            
+            // Filtro paso bajo suave
+            filter.type = 'lowpass';
+            filter.frequency.value = 800;
+            filter.Q.value = 1;
+            
+            // Volumen bajo para cada capa
+            gain.gain.value = 0.03 + (Math.random() * 0.02);
+            
+            // Modulación LFO para movimiento
+            const lfo = audioContext.createOscillator();
+            const lfoGain = audioContext.createGain();
+            lfo.frequency.value = 0.1 + (Math.random() * 0.3);
+            lfoGain.gain.value = frequency * 0.02;
+            
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+            
+            // Conexiones
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+            
+            // Iniciar
+            osc.start();
+            lfo.start();
+        }
+
+        function createNoiseLayer() {
+            const bufferSize = 2 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                b6 = white * 0.115926;
+            }
+            
+            const noise = audioContext.createBufferSource();
+            noise.buffer = noiseBuffer;
+            noise.loop = true;
+            
+            const noiseFilter = audioContext.createBiquadFilter();
+            noiseFilter.type = 'lowpass';
+            noiseFilter.frequency.value = 400;
+            
+            const noiseGain = audioContext.createGain();
+            noiseGain.gain.value = 0.015;
+            
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(masterGain);
+            noise.start();
+        }
+
+        // =====================
+        // Animación del visualizador
+        // =====================
+        function animateVisualizer() {
+            bars.forEach((bar, i) => {
+                const height = Math.max(4, Math.random() * 50 + 10);
+                bar.style.height = height + 'px';
+            });
+            
+            animationId = requestAnimationFrame(animateVisualizer);
+        }
+
+        // =====================
+        // Control de volumen
+        // =====================
+        volumeSlider.addEventListener('input', (e) => {
+            if (masterGain) {
+                masterGain.gain.value = e.target.value / 100;
+            }
+        });
+
+        // =====================
+        // Evento de entrada
+        // =====================
+        enterBtn.addEventListener('click', () => {
+            // Ocultar overlay
+            enterOverlay.classList.add('hidden');
+            
+            // Iniciar música
+            createAmbientMusic();
+            
+            // Mostrar controles
+            setTimeout(() => {
+                audioIndicator.classList.add('visible', 'playing');
+                volumeControl.classList.add('visible');
+                visualizer.classList.add('active');
+            }, 300);
+            
+            // Iniciar visualizador
+            animateVisualizer();
+        });
+
+        // =====================
+        // Soporte para teclado
+        // =====================
+        enterBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                enterBtn.click();
+            }
+        });
+
+        // =====================
+        // Cleanup al salir
+        // =====================
+        window.addEventListener('beforeunload', () => {
+            if (audioContext) {
+                audioContext.close();
+            }
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // =====================
+        // Pausar/reanudar al cambiar de pestaña
+        // =====================
+        document.addEventListener('visibilitychange', () => {
+            if (audioContext) {
+                if (document.hidden) {
+                    audioContext.suspend();
+                    audioIndicator.classList.remove('playing');
+                    audioIndicator.querySelector('.status-text').textContent = 'Audio pausado';
+                } else {
+                    audioContext.resume();
+                    audioIndicator.classList.add('playing');
+                    audioIndicator.querySelector('.status-text').textContent = 'Audio activo';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
